@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flor & Aroma - Cosméticos Naturais</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@6/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-900">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const initialContent = {
+      banner: {
+        title: "Bem-vindo à Flor & Aroma!",
+        subtitle: "Cosméticos naturais que cuidam de você e do planeta.",
+        image: "https://via.placeholder.com/1200x400?text=Banner+Flor+Aroma"
+      },
+      products: [
+        {
+          id: 1,
+          name: "Sabonete Artesanal Lavanda",
+          price: 24.90,
+          description: "Feito com óleos essenciais de lavanda, ideal para peles sensíveis.",
+          image: "https://via.placeholder.com/300x300?text=Sabonete"
+        },
+        {
+          id: 2,
+          name: "Óleo Corporal Rosas",
+          price: 49.90,
+          description: "Hidratação intensa com aroma floral natural.",
+          image: "https://via.placeholder.com/300x300?text=Óleo"
+        }
+      ],
+      about: {
+        title: "Sobre a Flor & Aroma",
+        description: "Na Flor & Aroma, criamos cosméticos naturais e sustentáveis, livres de crueldade e com ingredientes orgânicos."
+      },
+      contact: {
+        email: "contato@florandaroma.com",
+        phone: "+55 11 98765-4321"
+      }
+    };
+
+    const App = () => {
+      const [content, setContent] = React.useState(initialContent);
+      const [isEditing, setIsEditing] = React.useState(false);
+      const [cart, setCart] = React.useState([]);
+
+      const addToCart = (product) => {
+        setCart([...cart, product]);
+        alert(${product.name} adicionado ao carrinho!);
+      };
+
+      const saveContent = () => {
+        console.log("Conteúdo salvo:", JSON.stringify(content, null, 2));
+        alert("Alterações salvas! Copie o JSON do console para persistir.");
+        setIsEditing(false);
+      };
+
+      const updateContent = (section, key, value) => {
+        setContent((prev) => ({
+          ...prev,
+          [section]: { ...prev[section], [key]: value }
+        }));
+      };
+
+      const updateProduct = (id, field, value) => {
+        setContent((prev) => ({
+          ...prev,
+          products: prev.products.map((p) =>
+            p.id === id ? { ...p, [field]: value } : p
+          )
+        }));
+      };
+
+      const addProduct = () => {
+        const newProduct = {
+          id: content.products.length + 1,
+          name: "Novo Produto",
+          price: 0,
+          description: "Descrição do novo produto",
+          image: "https://via.placeholder.com/300x300?text=Novo+Produto"
+        };
+        setContent((prev) => ({
+          ...prev,
+          products: [...prev.products, newProduct]
+        }));
+      };
+
+      return (
+        <div className="font-sans">
+          {/* Navbar */}
+          <nav className="bg-green-600 text-white p-4 sticky top-0 z-10">
+            <div className="container mx-auto flex justify-between items-center">
+              <h1 className="text-2xl font-bold">Flor & Aroma</h1>
+              <div>
+                <button className="mr-4 hover:underline" onClick={() => setIsEditing(!isEditing)}>
+                  {isEditing ? "Sair do Modo Edição" : "Editar Conteúdo"}
+                </button>
+                <span>Carrinho: {cart.length} itens</span>
+              </div>
+            </div>
+          </nav>
+
+          {/* Banner */}
+          <section className="bg-gray-100 py-12">
+            <div className="container mx-auto text-center">
+              {isEditing ? (
+                <div className="space-y-4">
+                  <input type="text" value={content.banner.title} onChange={(e) => updateContent("banner", "title", e.target.value)} className="border p-2 w-full" placeholder="Título do banner" />
+                  <input type="text" value={content.banner.subtitle} onChange={(e) => updateContent("banner", "subtitle", e.target.value)} className="border p-2 w-full" placeholder="Subtítulo do banner" />
+                  <input type="text" value={content.banner.image} onChange={(e) => updateContent("banner", "image", e.target.value)} className="border p-2 w-full" placeholder="URL da imagem do banner" />
+                </div>
+              ) : (
+                <>
+                  <img src={content.banner.image} alt="Banner" className="w-full h-64 object-cover mb-4" />
+                  <h2 className="text-4xl font-bold mb-2">{content.banner.title}</h2>
+                  <p className="text-lg">{content.banner.subtitle}</p>
+                </>
+              )}
+            </div>
+          </section>
+
+          {/* Produtos */}
+          <section className="py-12">
+            <div className="container mx-auto">
+              <h2 className="text-3xl font-bold text-center mb-8">Nossos Produtos</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {content.products.map((product) => (
+                  <div key={product.id} className="border p-4 rounded-lg shadow">
+                    {isEditing ? (
+                      <div className="space-y-4">
+                        <input type="text" value={product.name} onChange={(e) => updateProduct(product.id, "name", e.target.value)} className="border p-2 w-full" placeholder="Nome do produto" />
+                        <input type="number" value={product.price} onChange={(e) => updateProduct(product.id, "price", parseFloat(e.target.value))} className="border p-2 w-full" placeholder="Preço" />
+                        <textarea value={product.description} onChange={(e) => updateProduct(product.id, "description", e.target.value)} className="border p-2 w-full" placeholder="Descrição" />
+                        <input type="text" value={product.image} onChange={(e) => updateProduct(product.id, "image", e.target.value)} className="border p-2 w-full" placeholder="URL da imagem" />
+                      </div>
+                    ) : (
+                      <>
+                        <img src={product.image} alt={product.name} className="w-full h-48 object-cover mb-4" />
+                        <h3 className="text-xl font-semibold">{product.name}</h3>
+                        <p className="text-gray-600">{product.description}</p>
+                        <p className="text-lg font-bold mt-2">R$ {product.price.toFixed(2)}</p>
+                        <button className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" onClick={() => addToCart(product)}>
+                          Adicionar ao Carrinho
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {isEditing && (
+                <button className="mt-8 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mx-auto block" onClick={addProduct}>
+                  Adicionar Novo Produto
+                </button>
+              )}
+            </div>
+          </section>
+
+          {/* Sobre */}
+          <section className="bg-gray-100 py-12">
+            <div className="container mx-auto text-center">
+              {isEditing ? (
+                <div className="space-y-4">
+                  <input type="text" value={content.about.title} onChange={(e) => updateContent("about", "title", e.target.value)} className="border p-2 w-full" placeholder="Título da seção sobre" />
+                  <textarea value={content.about.description} onChange={(e) => updateContent("about", "description", e.target.value)} className="border p-2 w-full" placeholder="Descrição da empresa" />
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-3xl font-bold mb-4">{content.about.title}</h2>
+                  <p className="text-lg">{content.about.description}</p>
+                </>
+              )}
+            </div>
+          </section>
+
+          {/* Contato */}
+          <section className="py-12">
+            <div className="container mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-4">Entre em Contato</h2>
+              {isEditing ? (
+                <div className="space-y-4">
+                  <input type="text" value={content.contact.email} onChange={(e) => updateContent("contact", "email", e.target.value)} className="border p-2 w-full" placeholder="E-mail de contato" />
+                  <input type="text" value={content.contact.phone} onChange={(e) => updateContent("contact", "phone", e.target.value)} className="border p-2 w-full" placeholder="Telefone de contato" />
+                </div>
+              ) : (
+                <div>
+                  <p className="text-lg">E-mail: {content.contact.email}</p>
+                  <p className="text-lg">Telefone: {content.contact.phone}</p>
+                  <button className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" onClick={() => alert("Formulário de contato não implementado. Use o e-mail ou telefone.")}>
+                    Enviar Mensagem
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Botão de Salvar */}
+          {isEditing && (
+            <div className="fixed bottom-4 right-4">
+              <button className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700" onClick={saveContent}>
+                Salvar Alterações
+              </button>
+            </div>
+          )}
+
+          {/* Rodapé */}
+          <footer className="bg-green-600 text-white p-4 text-center">
+            <p>© 2025 Flor & Aroma. Todos os direitos reservados.</p>
+          </footer>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>
